@@ -1,0 +1,47 @@
+.title {
+  display: grid;
+}
+.left-aligned {
+  grid-column: 1;
+  text-align: left;
+  font-size: 20px;
+  font-weight: bold;
+}
+.right-aligned {
+  grid-column: 2;
+  text-align: right;
+}
+
+.input-swap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 5px;
+}
+.input-swap > input {
+  width: 80%;
+  height: 5vh;
+  text-align: center;
+  font-size: 15px;
+  font-weight: bold;
+  padding: 5px;
+  border: 2px solid green;
+  border-radius: 5px;
+  color: brown;
+}
+
+.button-style {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 5px;
+}
+.button-style > button {
+  width: 60%;
+  border: none;
+  cursor: pointer;
+  background-color: #0a1391c7;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 25px;
+}

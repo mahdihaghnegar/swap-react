@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Web3 from "web3";
+import "./Swap.css";
 
 import swapContractABI from "../../artifacts/contracts/Swap.sol/Swap.json";
 import tokenAContractABI from "../../artifacts/contracts/MyTokenA.sol/MyTokenA.json";
@@ -227,11 +228,13 @@ function Swap({ account }) {
       <div>
         <div>
           <div>
-            <div>
-              <div>Token A:</div>
-              <div>Balance: {amounttokenA.toString()}</div>
+            <div className="title">
+              <div className="left-aligned">Token A:</div>
+              <div className="right-aligned">
+                Balance: {amounttokenA.toString()}
+              </div>
             </div>
-            <div>
+            <div className="input-swap">
               <input
                 type="text"
                 value={pretokenA}
@@ -241,19 +244,23 @@ function Swap({ account }) {
             </div>
           </div>
           {!isEmpty(pretokenA) && (
-            <button onClick={() => handleSwapAtoB(pretokenA)}>
-              Swap {pretokenA.toString()} A to {pretokenBshow.toString()} B
-            </button>
+            <div className="button-style">
+              <button onClick={() => handleSwapAtoB(pretokenA)}>
+                Swap {pretokenA.toString()} A to {pretokenBshow.toString()} B
+              </button>
+            </div>
           )}
         </div>
         <hr />
         <div>
           <div>
-            <div>
-              <div>Token B:</div>
-              <div>Balance : {amounttokenB.toString()}</div>
+            <div className="title">
+              <div className="left-aligned">Token B:</div>
+              <div className="right-aligned">
+                Balance : {amounttokenB.toString()}
+              </div>
             </div>
-            <div>
+            <div className="input-swap">
               <input
                 type="text"
                 value={pretokenB}
@@ -263,9 +270,11 @@ function Swap({ account }) {
             </div>
           </div>
           {!isEmpty(pretokenB) && (
-            <button onClick={() => handleSwapBtoA(pretokenB)}>
-              Swap {pretokenB.toString()} B to {pretokenAshow.toString()} A
-            </button>
+            <div className="button-style">
+              <button onClick={() => handleSwapBtoA(pretokenB)}>
+                Swap {pretokenB.toString()} B to {pretokenAshow.toString()} A
+              </button>
+            </div>
           )}
         </div>
       </div>
