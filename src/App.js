@@ -17,8 +17,10 @@ const App = () => {
 
   return (
     <div className="center">
-      <h1>Swap React App</h1>
-      <h6>Trade tokens in an instance</h6>
+      <div className="left-aligned">
+        <h1>Swap React App</h1>
+        <h4>Trade tokens A & B in an instance</h4>
+      </div>
       {account && <Swap account={account} />}
 
       <WalletButton change={handleChange} />

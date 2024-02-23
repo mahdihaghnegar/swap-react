@@ -9,8 +9,13 @@ function Swap({ account }) {
   const [swapContract, setSwapContract] = useState(null);
   const [tokenAContract, setTokenAContract] = useState(null);
   const [tokenBContract, setTokenBContract] = useState(null);
+
   const [pretokenB, setPretokenB] = useState(0);
+  const [pretokenAshow, setPretokenAshow] = useState(0);
+
   const [pretokenA, setPretokenA] = useState(0);
+  const [pretokenBshow, setPretokenBshow] = useState(0);
+
   const [amounttokenB, setAmountTokenB] = useState(0);
   const [amounttokenA, setAmountTokenA] = useState(0);
 
@@ -66,27 +71,7 @@ function Swap({ account }) {
       setSwapContract(null);
     }
   }
-  /* useEffect(() => {
-    initWeb3();
-  }, []);*/
 
-  // Use useEffect to watch for changes in the 'data' state
-  /*useEffect(() => {
-    // This block will be executed whenever 'data' changes
-    console.log("amounttokenA changed:", amounttokenA);
-    // setPretokenB(pretokenB);
-  }, [amounttokenA]);
-  useEffect(() => {
-    // This block will be executed whenever 'data' changes
-    console.log("amounttokenB changed:", amounttokenB);
-    // setPretokenB(pretokenB);
-  }, [amounttokenB]);*/
-
-  /*useEffect(() => {
-    // This block will be executed whenever 'data' changes
-    console.log("pretokenB changed:", pretokenB);
-    // setPretokenB(pretokenB);
-  }, [pretokenB]);*/
   useEffect(() => {
     initWeb3();
 
@@ -100,25 +85,6 @@ function Swap({ account }) {
     handlebalanceOfB();
   }, [swapContract]);
 
-  /*useEffect(() => {
-      // This block will be executed whenever 'data' changes
-      console.log("pretokenA changed:", pretokenA);
-      //setPretokenB(pretokenB);
-    }, [pretokenA]);*/
-  /*const handleContractInteraction = async () => {
-    // Example function call on your contract
-    try {
-      // Example: Call a read function
-      const result = await swapContract.methods.getK().call({ from: account });
-      console.log("Result from swapContract:", result);
-
-      // Example: Call a write function
-      // await contract.methods.someWriteFunction().send({ from: account });
-    } catch (error) {
-      console.error("Error while interacting with contract: ", error);
-    }
-  };*/
-
   const handleperviweSwapAtoB = async (amountTokenA) => {
     // Example function call on your contract
     try {
@@ -126,8 +92,8 @@ function Swap({ account }) {
       const result = await swapContract.methods
         .perviewSwapAtoB(amountTokenA)
         .call({ from: account });
-      setPretokenB(result);
-      console.log("Result from contract handleperviweSwapAtoB:", pretokenB);
+      setPretokenBshow(result);
+      console.log("Result from contract handleperviweSwapAtoB:", pretokenBshow);
 
       // Example: Call a write function
       // await contract.methods.someWriteFunction().send({ from: account });
@@ -142,8 +108,8 @@ function Swap({ account }) {
       const result = await swapContract.methods
         .perviewSwapBtoA(amountTokenB)
         .call({ from: account });
-      setPretokenB(result);
-      console.log("Result from contract handleperviweSwapBtoA:", pretokenA);
+      setPretokenAshow(result);
+      console.log("Result from contract handleperviweSwapBtoA:", pretokenAshow);
 
       // Example: Call a write function
       // await contract.methods.someWriteFunction().send({ from: account });
@@ -194,13 +160,13 @@ function Swap({ account }) {
         .allowance(account, swapcontractAddress)
         .call({ from: account });
       console.log(" allowance Token A to swap contract:", al);
-      if (al > 0) {
+      if (al >= amountTokenA) {
         // Example: Call a read function
         const result = await swapContract.methods
           .swapAtoB(amountTokenA)
           .send({ from: account });
-        setPretokenB(result);
-        console.log("Result from contract handleSwapAtoB:", pretokenB);
+        //setPretokenBshow(result);
+        //console.log("Result from contract handleSwapAtoB:", pretokenBshow);
         handlebalanceOfA();
         handlebalanceOfB();
       }
@@ -227,13 +193,13 @@ function Swap({ account }) {
         .allowance(account, swapcontractAddress)
         .call({ from: account });
       console.log(" allowance Token B to swap contract:", al);
-      if (al > 0) {
+      if (al >= amountTokenB) {
         // Example: Call a read function
         const result = await swapContract.methods
           .swapBtoA(amountTokenB)
           .send({ from: account });
-        setPretokenA(result);
-        console.log("Result from contract handleSwapBtoA:", pretokenA);
+        //setPretokenAshow(result);
+        //console.log("Result from contract handleSwapBtoA:", pretokenAshow);
         handlebalanceOfA();
         handlebalanceOfB();
       }
@@ -246,63 +212,60 @@ function Swap({ account }) {
 
   const handleInputChangeA = (event) => {
     setPretokenA(event.target.value);
-    setPretokenB(0);
-    // handleperviweSwapAtoB(event.target.value);
+    handleperviweSwapAtoB(event.target.value);
   };
   const handleInputChangeB = (event) => {
     setPretokenB(event.target.value);
-    setPretokenA(0);
-    // handleperviweSwapAtoB(event.target.value);
+    handleperviweSwapBtoA(event.target.value);
+  };
+  const isEmpty = (value) => {
+    return value === null || value === undefined; //|| value.trim() === "";
   };
 
   return (
     swapContract && (
       <div>
-        {/*<button onClick={handleContractInteraction}>get K</button>
-        <button onClick={() => handlebalanceOfA()}>Blance Of Token A</button>*/}
-        <p>Blance of Token A {amounttokenA.toString()}</p>
-        {/* <button onClick={() => handlebalanceOfB()}>Balance Of Token B</button> */}
-        <p>Blance of Token B {amounttokenB.toString()}</p>
-        <br />
         <div>
-          <input
-            type="text"
-            value={pretokenA}
-            onChange={handleInputChangeA}
-            placeholder="Enter some test Token A..."
-          />
-
-          <button onClick={() => handleperviweSwapAtoB(pretokenA)}>
-            preview Swap {pretokenA} token A to B
-          </button>
-          <button onClick={() => handleSwapAtoB(pretokenA)}>
-            Swap {pretokenA} token A to B
-          </button>
-
-          {pretokenB !== 0 && (
-            <p>
-              preview Swap {pretokenA} token A to B :{pretokenB.toString()}
-            </p>
+          <div>
+            <div>
+              <div>Token A:</div>
+              <div>Balance: {amounttokenA.toString()}</div>
+            </div>
+            <div>
+              <input
+                type="text"
+                value={pretokenA}
+                onChange={handleInputChangeA}
+                placeholder="Enter Amount of Token A..."
+              />
+            </div>
+          </div>
+          {!isEmpty(pretokenA) && (
+            <button onClick={() => handleSwapAtoB(pretokenA)}>
+              Swap {pretokenA.toString()} A to {pretokenBshow.toString()} B
+            </button>
           )}
-
-          <br />
-          <input
-            type="text"
-            value={pretokenB}
-            onChange={handleInputChangeB}
-            placeholder="Enter some test Token B..."
-          />
-          <button onClick={() => handleperviweSwapBtoA(pretokenB)}>
-            preview Swap {pretokenB} token B to A
-          </button>
-          <button onClick={() => handleSwapBtoA(pretokenB)}>
-            Swap {pretokenB} token B to A
-          </button>
-
-          {pretokenA !== 0 && (
-            <p>
-              preview Swap {pretokenB} token B to A :{pretokenA.toString()}
-            </p>
+        </div>
+        <hr />
+        <div>
+          <div>
+            <div>
+              <div>Token B:</div>
+              <div>Balance : {amounttokenB.toString()}</div>
+            </div>
+            <div>
+              <input
+                type="text"
+                value={pretokenB}
+                onChange={handleInputChangeB}
+                placeholder="Enter Amount of Token B..."
+              />
+            </div>
+          </div>
+          {!isEmpty(pretokenB) && (
+            <button onClick={() => handleSwapBtoA(pretokenB)}>
+              Swap {pretokenB.toString()} B to {pretokenAshow.toString()} A
+            </button>
           )}
         </div>
       </div>
