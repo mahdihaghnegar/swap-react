@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Web3 from "web3";
-
+import "./Wallet.css";
 function WalletButton({ change }) {
   const [connected, setConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
@@ -60,7 +60,9 @@ function WalletButton({ change }) {
       {connected ? (
         <p> wallet: {walletAddress}</p>
       ) : (
-        <button onClick={initWeb3}>Connect to Wallet</button>
+        <button className="panel-button" onClick={initWeb3}>
+          Connect to Wallet
+        </button>
       )}
     </div>
   );

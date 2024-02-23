@@ -1,8 +1,20 @@
 .panel-button {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
+  background-color: #007bffb6;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+
+  cursor: pointer;
+  border-radius: 25px;
+}
+p {
+  display: flex;
+  border-radius: 5px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  color: azure;
+  background-color: #007bffb6;
+  overflow: auto;
+  padding: 5px;
+}
