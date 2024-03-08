@@ -7,7 +7,6 @@ import tokenAContractABI from "../../artifacts/contracts/MyTokenA.sol/MyTokenA.j
 import tokenBContractABI from "../../artifacts/contracts/MyTokenB.sol/MyTokenB.json";
 
 function Swap({ account }) {
-  const [firstToken, setFirstToken] = useState(true);
   const [swapContract, setSwapContract] = useState(null);
   const [tokenAContract, setTokenAContract] = useState(null);
   const [tokenBContract, setTokenBContract] = useState(null);
@@ -95,10 +94,7 @@ function Swap({ account }) {
         .perviewSwapAtoB(amountTokenA)
         .call({ from: account });
       setPretokenBshow(result);
-      console.log(
-        "Result from contract " + amountTokenA + " handleperviweSwapAtoB:",
-        result // pretokenBshow
-      );
+      console.log("Result from contract handleperviweSwapAtoB:", pretokenBshow);
 
       // Example: Call a write function
       // await contract.methods.someWriteFunction().send({ from: account });
@@ -114,10 +110,7 @@ function Swap({ account }) {
         .perviewSwapBtoA(amountTokenB)
         .call({ from: account });
       setPretokenAshow(result);
-      console.log(
-        "Result from contract " + amountTokenB + " handleperviweSwapBtoA:",
-        result //pretokenAshow
-      );
+      console.log("Result from contract handleperviweSwapBtoA:", pretokenAshow);
 
       // Example: Call a write function
       // await contract.methods.someWriteFunction().send({ from: account });
@@ -220,137 +213,72 @@ function Swap({ account }) {
 
   const handleInputChangeA = (event) => {
     setPretokenA(event.target.value);
-    if (firstToken) handleperviweSwapAtoB(event.target.value);
+    handleperviweSwapAtoB(event.target.value);
   };
   const handleInputChangeB = (event) => {
     setPretokenB(event.target.value);
-    if (!firstToken) handleperviweSwapBtoA(event.target.value);
+    handleperviweSwapBtoA(event.target.value);
   };
-
   const isEmpty = (value) => {
     return value === null || value === undefined; //|| value.trim() === "";
   };
-  const handleSwitch = () => {
-    if (firstToken) {
-      setFirstToken(false);
-      setPretokenB(pretokenBshow.toString());
-      handleperviweSwapBtoA(pretokenBshow.toString());
-    } else {
-      setFirstToken(true);
-      setPretokenA(pretokenAshow.toString());
-      handleperviweSwapAtoB(pretokenAshow.toString());
-    }
-  };
 
   return (
-    <>
+    swapContract && (
       <div>
-        {firstToken ? (
+        <div>
           <div>
-            <div>
-              <div className="title">
-                <div className="left-aligned">Token A:</div>
-                <div className="right-aligned">
-                  Balance: {amounttokenA.toString()}
-                </div>
+            <div className="title">
+              <div className="left-aligned">Token A:</div>
+              <div className="right-aligned">
+                Balance: {amounttokenA.toString()}
               </div>
-              <div className="input-swap">
-                <input
-                  type="text"
-                  value={pretokenA}
-                  onChange={handleInputChangeA}
-                  placeholder="Enter Amount of Token A..."
-                />
-              </div>
+            </div>
+            <div className="input-swap">
+              <input
+                type="text"
+                value={pretokenA}
+                onChange={handleInputChangeA}
+                placeholder="Enter Amount of Token A..."
+              />
             </div>
           </div>
-        ) : (
+          {!isEmpty(pretokenA) && (
+            <div className="button-style">
+              <button onClick={() => handleSwapAtoB(pretokenA)}>
+                Swap {pretokenA.toString()} A to {pretokenBshow.toString()} B
+              </button>
+            </div>
+          )}
+        </div>
+        <hr />
+        <div>
           <div>
-            <div>
-              <div className="title">
-                <div className="left-aligned">Token B:</div>
-                <div className="right-aligned">
-                  Balance: {amounttokenB.toString()}
-                </div>
+            <div className="title">
+              <div className="left-aligned">Token B:</div>
+              <div className="right-aligned">
+                Balance : {amounttokenB.toString()}
               </div>
-              <div className="input-swap">
-                <input
-                  type="text"
-                  value={pretokenB}
-                  onChange={handleInputChangeB}
-                  placeholder="Enter Amount of Token B..."
-                />
-              </div>
+            </div>
+            <div className="input-swap">
+              <input
+                type="text"
+                value={pretokenB}
+                onChange={handleInputChangeB}
+                placeholder="Enter Amount of Token B..."
+              />
             </div>
           </div>
-        )}
-      </div>
-      <div className="button-style">
-        <button onClick={() => handleSwitch()}>Switch</button>
-      </div>
-      <div>
-        {!firstToken ? (
-          <div>
-            <div>
-              <div>
-                <div className="title">
-                  <div className="left-aligned">Token A:</div>
-                  <div className="right-aligned">
-                    Balance: {amounttokenA.toString()}
-                  </div>
-                </div>
-                <div className="input-swap">
-                  <input
-                    type="text"
-                    disabled="true"
-                    value={pretokenAshow.toString()}
-                    onChange={handleInputChangeA}
-                    placeholder="Enter Amount of Token A..."
-                  />
-                </div>
-              </div>
+          {!isEmpty(pretokenB) && (
+            <div className="button-style">
+              <button onClick={() => handleSwapBtoA(pretokenB)}>
+                Swap {pretokenB.toString()} B to {pretokenAshow.toString()} A
+              </button>
             </div>
-          </div>
-        ) : (
-          <div>
-            <div>
-              <div className="title">
-                <div className="left-aligned">Token B:</div>
-                <div className="right-aligned">
-                  Balance : {amounttokenB.toString()}
-                </div>
-              </div>
-              <div className="input-swap">
-                <input
-                  type="text"
-                  disabled="true"
-                  value={pretokenBshow.toString()}
-                  onChange={handleInputChangeB}
-                  placeholder="Enter Amount of Token B..."
-                />
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-      <div>
-        <div className="button-style">
-          <button
-            onClick={() =>
-              firstToken ? handleSwapAtoB(pretokenA) : handleSwapBtoA(pretokenB)
-            }
-          >
-            <div>
-              Swap {firstToken ? pretokenA.toString() : pretokenB.toString()}
-              {firstToken ? " A " : " B "}
-              to{" "}
-              {firstToken ? pretokenBshow.toString() : pretokenAshow.toString()}
-              {!firstToken ? " A " : " B "}
-            </div>
-          </button>
+          )}
         </div>
       </div>
-    </>
+    )
   );
 }
 

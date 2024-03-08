@@ -25,9 +25,10 @@
   font-size: 15px;
   font-weight: bold;
   padding: 5px;
-  border: 2px solid green;
+  border: 2px solid rgb(25, 3, 104);
   border-radius: 5px;
-  color: brown;
+  color: rgb(28, 4, 73);
+  background-color: #e6e7f5c7;
 }
 
 .button-style {
