@@ -5,25 +5,36 @@ import "./App.css";
 
 const App = () => {
   const [account, setAccount] = useState(null);
+  const [sepolia, setSepolia] = useState(false);
 
-  function handleChange(address) {
+  function handleChange(address, isSepolia) {
     console.log("handle setAccount changed:", address);
+    console.log("handle setSepolia changed:", isSepolia);
     setAccount(address);
+    setSepolia(isSepolia);
   }
   useEffect(() => {
     // This block will be executed whenever 'account' changes
     console.log("app account changed:", account);
-  }, [account]);
+  }, [account, sepolia]);
 
   return (
-    <div className="center">
-      <div className="left-aligned">
-        <h1>Swap React App</h1>
-        <h4>Trade tokens A & B in an instance</h4>
+    <div className="App">
+      <div className="right-aligned">
+        <WalletButton change={handleChange} showWallet={false} />
       </div>
-      {account && <Swap account={account} />}
 
-      <WalletButton change={handleChange} />
+      <div className="center">
+        <div className="left-aligned">
+          <h1>Swap React App</h1>
+          <h4>Trade tokens A & B in an instance</h4>
+        </div>
+        <hr />
+        {account && sepolia && <Swap account={account} />}
+        <div className="center-connect">
+          <WalletButton change={handleChange} showWallet={true} />
+        </div>
+      </div>
     </div>
   );
 };
