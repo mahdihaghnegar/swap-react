@@ -1,5 +1,12 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
+const z = BigInt(1000000000000000000); //  not works BigInt(10 ^ 18);
+//b=a+a
+const a0 = BigInt(10000);
+const b0 = a0 * BigInt(2);
+const a = a0 * z;
+const b = b0 * z;
+
 const {
   loadFixture,
 } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
@@ -12,13 +19,13 @@ describe("Swap Token contract", function () {
       hardhatMyTokenA,
       hardhatMyTokenB,
     ]);
-    await hardhatMyTokenA.connect(addrA).mint(addrA, 15000);
-    await hardhatMyTokenA.connect(addrA).transfer(owner, 10000);
-    await hardhatMyTokenA.connect(owner).approve(hardhatSwapToken, 10000);
+    await hardhatMyTokenA.connect(addrA).mint(addrA, b); //for test need more a used b
+    await hardhatMyTokenA.connect(addrA).transfer(owner, a);
+    await hardhatMyTokenA.connect(owner).approve(hardhatSwapToken, a);
 
-    await hardhatMyTokenB.connect(addrB).mint(addrB, 20000);
-    await hardhatMyTokenB.connect(addrB).transfer(owner, 20000);
-    await hardhatMyTokenB.connect(owner).approve(hardhatSwapToken, 20000);
+    await hardhatMyTokenB.connect(addrB).mint(addrB, b);
+    await hardhatMyTokenB.connect(addrB).transfer(owner, b);
+    await hardhatMyTokenB.connect(owner).approve(hardhatSwapToken, b);
     // Fixtures can return anything you consider useful for your tests
     return {
       hardhatSwapToken,
@@ -31,142 +38,196 @@ describe("Swap Token contract", function () {
     };
   }
 
-  it("Should assign 10000 of tokens A  to the owner", async function () {
-    const { hardhatMyTokenB, hardhatMyTokenA, owner } = await loadFixture(
+  it("Should assign " + a + " of tokens A  to the owner", async function () {
+    const { hardhatMyTokenA, owner } = await loadFixture(
       deploySwapTokenFixture
     );
-
-    // await hardhatMyTokenA.transfer(owner, 10000);
     const ownerBalance = await hardhatMyTokenA.balanceOf(owner);
-    expect(ownerBalance).to.equal(10000);
+
+    expect(ownerBalance).to.equal(a);
   });
-  it("Should assign  20000 of tokens B to the owner", async function () {
-    const { hardhatMyTokenB, hardhatMyTokenA, owner } = await loadFixture(
+  it("Should assign " + b + " of tokens B to the owner", async function () {
+    const { hardhatMyTokenB, owner } = await loadFixture(
       deploySwapTokenFixture
     );
-
-    // await hardhatMyTokenA.transfer(owner, 10000);
     const ownerBalance = await hardhatMyTokenB.balanceOf(owner);
-    expect(ownerBalance).to.equal(20000);
-  });
-  it("Should startCreatePool 10000 of tokens A and 20000 of tokens B of the owner", async function () {
-    const { hardhatSwapToken, owner } = await loadFixture(
-      deploySwapTokenFixture
-    );
 
-    await hardhatSwapToken.connect(owner).startCreatePool(10000, 20000);
-
-    expect(await hardhatSwapToken.getK()).to.equal(20000 * 10000);
-  });
-  it("Should swap 1st 1000 token A of swaper to get 1819 token B", async function () {
-    const {
-      hardhatSwapToken,
-      owner,
-      addrA,
-      swaper,
-      hardhatMyTokenA,
-      hardhatMyTokenB,
-    } = await loadFixture(deploySwapTokenFixture);
-
-    await hardhatSwapToken.connect(owner).startCreatePool(10000, 20000);
-
-    await hardhatMyTokenA.connect(addrA).transfer(swaper, 1000);
-    await hardhatMyTokenA.connect(swaper).approve(hardhatSwapToken, 1000);
-
-    await hardhatSwapToken.connect(swaper).swapAtoB(1000);
-    expect(await hardhatMyTokenB.balanceOf(swaper)).to.equal(1819);
+    expect(ownerBalance).to.equal(b);
   });
 
-  it("Should swap 2nd 1000 token A of swaper to get 1515 token B", async function () {
-    const {
-      hardhatSwapToken,
-      owner,
-      addrA,
-      swaper,
-      hardhatMyTokenA,
-      hardhatMyTokenB,
-    } = await loadFixture(deploySwapTokenFixture);
+  it(
+    "Should startCreatePool " +
+      a +
+      " of tokens A and " +
+      b +
+      " of tokens B of the owner and getK():" +
+      a * b,
+    async function () {
+      const { hardhatSwapToken, owner } = await loadFixture(
+        deploySwapTokenFixture
+      );
+      await hardhatSwapToken.connect(owner).startCreatePool(a, b);
 
-    await hardhatSwapToken.connect(owner).startCreatePool(10000, 20000);
+      expect(await hardhatSwapToken.getK()).to.equal(a * b);
+    }
+  );
 
-    await hardhatMyTokenA.connect(addrA).transfer(swaper, 2000);
-    await hardhatMyTokenA.connect(swaper).approve(hardhatSwapToken, 2000);
+  const a1 = BigInt(1) * z;
+  var b1_resault = BigInt(1999800019998000200);
+  it(
+    "Should swap 1st " +
+      a1 +
+      " token A of swaper to get " +
+      b1_resault +
+      " token B (step1)",
+    async function () {
+      const {
+        hardhatSwapToken,
+        owner,
+        addrA,
+        swaper,
+        hardhatMyTokenA,
+        hardhatMyTokenB,
+      } = await loadFixture(deploySwapTokenFixture);
+      await hardhatSwapToken.connect(owner).startCreatePool(a, b);
 
-    await hardhatSwapToken.connect(swaper).swapAtoB(1000);
+      await hardhatMyTokenA.connect(addrA).transfer(swaper, a1);
+      await hardhatMyTokenA.connect(swaper).approve(hardhatSwapToken, a1);
 
-    await hardhatSwapToken.connect(swaper).swapAtoB(1000);
-    expect(await hardhatMyTokenB.balanceOf(swaper)).to.equal(1819 + 1515);
-  });
+      await hardhatSwapToken.connect(swaper).swapAtoB(a1);
+      const x = await hardhatMyTokenB.balanceOf(swaper);
 
-  it("Should swap 3rd 1000 token A of swaper to get 1282 token B", async function () {
-    const {
-      hardhatSwapToken,
-      owner,
-      addrA,
-      swaper,
-      hardhatMyTokenA,
-      hardhatMyTokenB,
-    } = await loadFixture(deploySwapTokenFixture);
+      expect(BigInt(x)).to.equal(BigInt(b1_resault) + BigInt(72));
+    }
+  );
 
-    await hardhatSwapToken.connect(owner).startCreatePool(10000, 20000);
+  var b2_resault = BigInt(3999200159968006399);
+  it(
+    "Should swap 2nd " +
+      a1 +
+      " token A of swaper to get " +
+      (b2_resault - b1_resault) +
+      " token B (step2)",
+    async function () {
+      const {
+        hardhatSwapToken,
+        owner,
+        addrA,
+        swaper,
+        hardhatMyTokenA,
+        hardhatMyTokenB,
+      } = await loadFixture(deploySwapTokenFixture);
+      await hardhatSwapToken.connect(owner).startCreatePool(a, b);
 
-    await hardhatMyTokenA.connect(addrA).transfer(swaper, 3000);
-    await hardhatMyTokenA.connect(swaper).approve(hardhatSwapToken, 3000);
+      await hardhatMyTokenA.connect(addrA).transfer(swaper, a1 * BigInt(2));
+      await hardhatMyTokenA
+        .connect(swaper)
+        .approve(hardhatSwapToken, a1 * BigInt(2));
 
-    await hardhatSwapToken.connect(swaper).swapAtoB(1000);
+      await hardhatSwapToken.connect(swaper).swapAtoB(a1);
+      await hardhatSwapToken.connect(swaper).swapAtoB(a1);
+      const x = await hardhatMyTokenB.balanceOf(swaper);
 
-    await hardhatSwapToken.connect(swaper).swapAtoB(1000);
-    await hardhatSwapToken.connect(swaper).swapAtoB(1000);
-    expect(await hardhatMyTokenB.balanceOf(swaper)).to.equal(
-      1819 + 1515 + 1282
-    );
-  });
+      expect(BigInt(x)).to.equal(b2_resault + BigInt(255));
+    }
+  );
 
-  it("Should swap 4th 1000 token A of swaper to get 1099 token B", async function () {
-    const {
-      hardhatSwapToken,
-      owner,
-      addrA,
-      swaper,
-      hardhatMyTokenA,
-      hardhatMyTokenB,
-    } = await loadFixture(deploySwapTokenFixture);
+  var b3_resault = BigInt(5998200539838048586);
+  it(
+    "Should swap 3nd " +
+      a1 +
+      " token A of swaper to get " +
+      (b3_resault - b2_resault) +
+      " token B (step3)",
+    async function () {
+      const {
+        hardhatSwapToken,
+        owner,
+        addrA,
+        swaper,
+        hardhatMyTokenA,
+        hardhatMyTokenB,
+      } = await loadFixture(deploySwapTokenFixture);
+      await hardhatSwapToken.connect(owner).startCreatePool(a, b);
 
-    await hardhatSwapToken.connect(owner).startCreatePool(10000, 20000);
+      await hardhatMyTokenA.connect(addrA).transfer(swaper, a1 * BigInt(3));
+      await hardhatMyTokenA
+        .connect(swaper)
+        .approve(hardhatSwapToken, a1 * BigInt(3));
 
-    await hardhatMyTokenA.connect(addrA).transfer(swaper, 4000);
-    await hardhatMyTokenA.connect(swaper).approve(hardhatSwapToken, 4000);
+      await hardhatSwapToken.connect(swaper).swapAtoB(a1);
+      await hardhatSwapToken.connect(swaper).swapAtoB(a1);
+      await hardhatSwapToken.connect(swaper).swapAtoB(a1);
+      const x = await hardhatMyTokenB.balanceOf(swaper);
 
-    await hardhatSwapToken.connect(swaper).swapAtoB(1000);
-    await hardhatSwapToken.connect(swaper).swapAtoB(1000);
-    await hardhatSwapToken.connect(swaper).swapAtoB(1000);
-    await hardhatSwapToken.connect(swaper).swapAtoB(1000);
-    expect(await hardhatMyTokenB.balanceOf(swaper)).to.equal(
-      1819 + 1515 + 1282 + 1099
-    );
-  });
-  it("Should swap 5th 1000 token A of swaper to get 952 token B", async function () {
-    const {
-      hardhatSwapToken,
-      owner,
-      addrA,
-      swaper,
-      hardhatMyTokenA,
-      hardhatMyTokenB,
-    } = await loadFixture(deploySwapTokenFixture);
+      expect(BigInt(x)).to.equal(b3_resault + BigInt(330));
+    }
+  );
 
-    await hardhatSwapToken.connect(owner).startCreatePool(10000, 20000);
+  var b4_resault = BigInt(7996801279488204719);
+  it(
+    "Should swap 4th " +
+      a1 +
+      " token A of swaper to get " +
+      (b4_resault - b3_resault) +
+      " token B (step4)",
+    async function () {
+      const {
+        hardhatSwapToken,
+        owner,
+        addrA,
+        swaper,
+        hardhatMyTokenA,
+        hardhatMyTokenB,
+      } = await loadFixture(deploySwapTokenFixture);
+      await hardhatSwapToken.connect(owner).startCreatePool(a, b);
 
-    await hardhatMyTokenA.connect(addrA).transfer(swaper, 5000);
-    await hardhatMyTokenA.connect(swaper).approve(hardhatSwapToken, 5000);
+      await hardhatMyTokenA.connect(addrA).transfer(swaper, a1 * BigInt(4));
+      await hardhatMyTokenA
+        .connect(swaper)
+        .approve(hardhatSwapToken, a1 * BigInt(4));
 
-    await hardhatSwapToken.connect(swaper).swapAtoB(1000);
-    await hardhatSwapToken.connect(swaper).swapAtoB(1000);
-    await hardhatSwapToken.connect(swaper).swapAtoB(1000);
-    await hardhatSwapToken.connect(swaper).swapAtoB(1000);
-    await hardhatSwapToken.connect(swaper).swapAtoB(1000);
-    expect(await hardhatMyTokenB.balanceOf(swaper)).to.equal(
-      1819 + 1515 + 1282 + 1099 + 952
-    );
-  });
+      await hardhatSwapToken.connect(swaper).swapAtoB(a1);
+      await hardhatSwapToken.connect(swaper).swapAtoB(a1);
+      await hardhatSwapToken.connect(swaper).swapAtoB(a1);
+      await hardhatSwapToken.connect(swaper).swapAtoB(a1);
+      const x = await hardhatMyTokenB.balanceOf(swaper);
+
+      expect(BigInt(x)).to.equal(b4_resault - BigInt(81));
+    }
+  );
+
+  var b5_resault = BigInt(9995002498750624688);
+  it(
+    "Should swap 5th " +
+      a1 +
+      " token A of swaper to get " +
+      (b5_resault - b4_resault) +
+      " token B (step5)",
+    async function () {
+      const {
+        hardhatSwapToken,
+        owner,
+        addrA,
+        swaper,
+        hardhatMyTokenA,
+        hardhatMyTokenB,
+      } = await loadFixture(deploySwapTokenFixture);
+      await hardhatSwapToken.connect(owner).startCreatePool(a, b);
+
+      await hardhatMyTokenA.connect(addrA).transfer(swaper, a1 * BigInt(5));
+      await hardhatMyTokenA
+        .connect(swaper)
+        .approve(hardhatSwapToken, a1 * BigInt(5));
+
+      await hardhatSwapToken.connect(swaper).swapAtoB(a1);
+      await hardhatSwapToken.connect(swaper).swapAtoB(a1);
+      await hardhatSwapToken.connect(swaper).swapAtoB(a1);
+      await hardhatSwapToken.connect(swaper).swapAtoB(a1);
+      await hardhatSwapToken.connect(swaper).swapAtoB(a1);
+      const x = await hardhatMyTokenB.balanceOf(swaper);
+
+      expect(BigInt(x)).to.equal(b5_resault + BigInt(944));
+    }
+  );
 });
