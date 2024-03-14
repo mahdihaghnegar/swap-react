@@ -6,7 +6,7 @@ const a0 = BigInt(10000);
 const b0 = a0 * BigInt(2);
 const a = a0 * z;
 const b = b0 * z;
-
+const k = a * b;
 const {
   loadFixture,
 } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
@@ -72,8 +72,10 @@ describe("Swap Token contract", function () {
     }
   );
 
-  const a1 = BigInt(1) * z;
-  var b1_resault = BigInt(1999800019998000200);
+  const a1 = BigInt(100) * z; //set send a1 for all steps
+  const b1 = k / (a + a1 * BigInt(1));
+  var b1_resault = b - b1; //if a1=1 BigInt(1999800019998000200);
+
   it(
     "Should swap 1st " +
       a1 +
@@ -97,11 +99,12 @@ describe("Swap Token contract", function () {
       await hardhatSwapToken.connect(swaper).swapAtoB(a1);
       const x = await hardhatMyTokenB.balanceOf(swaper);
 
-      expect(BigInt(x)).to.equal(BigInt(b1_resault) + BigInt(72));
+      expect(BigInt(x)).to.equal(BigInt(b1_resault));
     }
   );
+  const b2 = k / (a + a1 * BigInt(2));
+  var b2_resault = b - b2; //if a1=1 get BigInt(1999400139970006199);
 
-  var b2_resault = BigInt(3999200159968006399);
   it(
     "Should swap 2nd " +
       a1 +
@@ -126,13 +129,16 @@ describe("Swap Token contract", function () {
 
       await hardhatSwapToken.connect(swaper).swapAtoB(a1);
       await hardhatSwapToken.connect(swaper).swapAtoB(a1);
+
       const x = await hardhatMyTokenB.balanceOf(swaper);
 
-      expect(BigInt(x)).to.equal(b2_resault + BigInt(255));
+      expect(BigInt(x)).to.equal(b2_resault);
     }
   );
 
-  var b3_resault = BigInt(5998200539838048586);
+  const b3 = k / (a + a1 * BigInt(3));
+  var b3_resault = b - b3; //if a1=1 get: BigInt(1999000379870042187);
+
   it(
     "Should swap 3nd " +
       a1 +
@@ -158,13 +164,16 @@ describe("Swap Token contract", function () {
       await hardhatSwapToken.connect(swaper).swapAtoB(a1);
       await hardhatSwapToken.connect(swaper).swapAtoB(a1);
       await hardhatSwapToken.connect(swaper).swapAtoB(a1);
+
       const x = await hardhatMyTokenB.balanceOf(swaper);
 
-      expect(BigInt(x)).to.equal(b3_resault + BigInt(330));
+      expect(BigInt(x)).to.equal(b3_resault);
     }
   );
 
-  var b4_resault = BigInt(7996801279488204719);
+  const b4 = k / (a + a1 * BigInt(4));
+  var b4_resault = b - b4; //if a1=1 get  BigInt(1998600739650156133);
+
   it(
     "Should swap 4th " +
       a1 +
@@ -191,13 +200,15 @@ describe("Swap Token contract", function () {
       await hardhatSwapToken.connect(swaper).swapAtoB(a1);
       await hardhatSwapToken.connect(swaper).swapAtoB(a1);
       await hardhatSwapToken.connect(swaper).swapAtoB(a1);
+
       const x = await hardhatMyTokenB.balanceOf(swaper);
 
-      expect(BigInt(x)).to.equal(b4_resault - BigInt(81));
+      expect(BigInt(x)).to.equal(b4_resault);
     }
   );
 
-  var b5_resault = BigInt(9995002498750624688);
+  const b5 = k / (a + a1 * BigInt(5));
+  var b5_resault = b - b5; //if a1=1 get BigInt(1998201219262419969);
   it(
     "Should swap 5th " +
       a1 +
@@ -225,9 +236,10 @@ describe("Swap Token contract", function () {
       await hardhatSwapToken.connect(swaper).swapAtoB(a1);
       await hardhatSwapToken.connect(swaper).swapAtoB(a1);
       await hardhatSwapToken.connect(swaper).swapAtoB(a1);
+
       const x = await hardhatMyTokenB.balanceOf(swaper);
 
-      expect(BigInt(x)).to.equal(b5_resault + BigInt(944));
+      expect(BigInt(x)).to.equal(b5_resault);
     }
   );
 });
