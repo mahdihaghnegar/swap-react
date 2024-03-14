@@ -72,7 +72,7 @@ swap address: 0x1Cd46004642868d4BDd3610Ca3Bf16DF9F0d6CE6
   console.log("swap address:", swapAddress);*/
 
   //last old swap
-  const swapAddress = "0x1Cd46004642868d4BDd3610Ca3Bf16DF9F0d6CE6"; // "0x1A16c39286bB3C9D551D7fC9A689d1ace43d4c41";
+  const swapAddress = "0x1A16c39286bB3C9D551D7fC9A689d1ace43d4c41"; // "0x1Cd46004642868d4BDd3610Ca3Bf16DF9F0d6CE6"; // "0x1A16c39286bB3C9D551D7fC9A689d1ace43d4c41";
 
   const Swapcontract = await hre.ethers.getContractFactory("Swap");
   const swap = Swapcontract.attach(swapAddress);
@@ -82,7 +82,7 @@ swap address: 0x1Cd46004642868d4BDd3610Ca3Bf16DF9F0d6CE6
     "Swap allowance Token A:",
     await tokenA.allowance(deployer, swapAddress)
   );
-  // await tokenB.approve(swapAddress, b); //comment on if it is ok
+  //await tokenB.approve(swapAddress, b); //comment on if it is ok
   console.log(
     "Swap allowance Token B:",
     await tokenB.allowance(deployer, swapAddress)
