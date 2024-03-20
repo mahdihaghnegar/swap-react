@@ -12,9 +12,11 @@ const App = () => {
     console.log("handle setSepolia changed:", isSepolia);
     setAccount(address);
     setSepolia(isSepolia);
+    // if (address !== null && isSepolia) window.location.reload();
   }
   useEffect(() => {
     // This block will be executed whenever 'account' changes
+    // if (account === null && !sepolia) window.location.reload();
     console.log("app account changed:", account);
   }, [account, sepolia]);
 

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Web3 from "web3";
 import "./Swap.css";
+import BigNumber from "bignumber.js";
+//import { BigNumber } from "./node_modules/bignumber.js/bignumber.mjs";
 
 import swapContractABI from "../../artifacts/contracts/Swap.sol/Swap.json";
 import tokenAContractABI from "../../artifacts/contracts/MyTokenA.sol/MyTokenA.json";
@@ -20,8 +22,9 @@ function Swap({ account }) {
 
   const [amounttokenB, setAmountTokenB] = useState(0);
   const [amounttokenA, setAmountTokenA] = useState(0);
+  const z = new BigNumber(1000000000000000000);
 
-  const swapcontractAddress = "0x1Cd46004642868d4BDd3610Ca3Bf16DF9F0d6CE6";
+  const swapcontractAddress = "0x1A16c39286bB3C9D551D7fC9A689d1ace43d4c41";
 
   async function initWeb3() {
     if (window.ethereum) {
@@ -92,9 +95,10 @@ function Swap({ account }) {
     try {
       // Example: Call a read function
       const result = await swapContract.methods
-        .perviewSwapAtoB(amountTokenA)
+        .perviewSwapAtoB(amountTokenA.toFixed(0))
         .call({ from: account });
-      setPretokenBshow(result);
+      const r2 = BigNumber(result).dividedBy(z).toFixed(18);
+      setPretokenBshow(r2);
       console.log(
         "Result from contract " + amountTokenA + " handleperviweSwapAtoB:",
         result // pretokenBshow
@@ -111,9 +115,10 @@ function Swap({ account }) {
     try {
       // Example: Call a read function
       const result = await swapContract.methods
-        .perviewSwapBtoA(amountTokenB)
+        .perviewSwapBtoA(amountTokenB.toFixed(0))
         .call({ from: account });
-      setPretokenAshow(result);
+      const r2 = BigNumber(result).dividedBy(z).toFixed(18);
+      setPretokenAshow(r2);
       console.log(
         "Result from contract " + amountTokenB + " handleperviweSwapBtoA:",
         result //pretokenAshow
@@ -132,8 +137,11 @@ function Swap({ account }) {
       const bl = await tokenAContract.methods
         .balanceOf(account)
         .call({ from: account });
-      console.log(" balanceOf token A:", bl);
-      setAmountTokenA(bl);
+
+      const bl2 = BigNumber(bl).dividedBy(z).toFixed(18);
+      console.log(" balanceOf token A:", bl2);
+
+      setAmountTokenA(bl2);
     } catch (error) {
       console.error("Error while balanceOf token A: ", error);
     }
@@ -145,8 +153,11 @@ function Swap({ account }) {
       const bl = await tokenBContract.methods
         .balanceOf(account)
         .call({ from: account });
-      console.log(" balanceOf token B:", bl);
-      setAmountTokenB(bl);
+
+      const bl2 = BigNumber(bl).dividedBy(z).toFixed(18);
+      console.log(" balanceOf token B:", bl2);
+
+      setAmountTokenB(bl2);
     } catch (error) {
       console.error("Error while balanceOf token B: ", error);
     }
@@ -159,24 +170,27 @@ function Swap({ account }) {
         .balanceOf(account)
         .call({ from: account });
       console.log(" balanceOf token A:", bl);
+      const amA = z.multipliedBy(amountTokenA).toFixed(0);
+      if (bl >= amA) {
+        const ar = await tokenAContract.methods
+          .approve(swapcontractAddress, amA)
+          .send({ from: account });
+        console.log(" approve token A to swap contract:", ar);
+        const al = await tokenAContract.methods
+          .allowance(account, swapcontractAddress)
+          .call({ from: account });
+        console.log(" allowance Token A to swap contract:", al);
 
-      const ar = await tokenAContract.methods
-        .approve(swapcontractAddress, amountTokenA)
-        .send({ from: account });
-      console.log(" approve token A to swap contract:", ar);
-      const al = await tokenAContract.methods
-        .allowance(account, swapcontractAddress)
-        .call({ from: account });
-      console.log(" allowance Token A to swap contract:", al);
-      if (al >= amountTokenA) {
         // Example: Call a read function
         const result = await swapContract.methods
-          .swapAtoB(amountTokenA)
+          .swapAtoB(amA)
           .send({ from: account });
         //setPretokenBshow(result);
         //console.log("Result from contract handleSwapAtoB:", pretokenBshow);
         handlebalanceOfA();
         handlebalanceOfB();
+        setPretokenBshow(0);
+        setPretokenAshow(0);
       }
       // Example: Call a write function
       // await contract.methods.someWriteFunction().send({ from: account });
@@ -192,24 +206,27 @@ function Swap({ account }) {
         .balanceOf(account)
         .call({ from: account });
       console.log(" balanceOf token B:", bl);
+      const amB = z.multipliedBy(amountTokenB).toFixed(0);
+      if (bl >= amB) {
+        const ar = await tokenBContract.methods
+          .approve(swapcontractAddress, amB)
+          .send({ from: account });
+        console.log(" approve token B to swap contract:", ar);
+        const al = await tokenBContract.methods
+          .allowance(account, swapcontractAddress)
+          .call({ from: account });
+        console.log(" allowance Token B to swap contract:", al);
 
-      const ar = await tokenBContract.methods
-        .approve(swapcontractAddress, amountTokenB)
-        .send({ from: account });
-      console.log(" approve token B to swap contract:", ar);
-      const al = await tokenBContract.methods
-        .allowance(account, swapcontractAddress)
-        .call({ from: account });
-      console.log(" allowance Token B to swap contract:", al);
-      if (al >= amountTokenB) {
         // Example: Call a read function
         const result = await swapContract.methods
-          .swapBtoA(amountTokenB)
+          .swapBtoA(amB)
           .send({ from: account });
         //setPretokenAshow(result);
         //console.log("Result from contract handleSwapBtoA:", pretokenAshow);
         handlebalanceOfA();
         handlebalanceOfB();
+        setPretokenBshow(0);
+        setPretokenAshow(0);
       }
       // Example: Call a write function
       // await contract.methods.someWriteFunction().send({ from: account });
@@ -219,12 +236,15 @@ function Swap({ account }) {
   };
 
   const handleInputChangeA = (event) => {
+    const s = z.multipliedBy(event.target.value);
     setPretokenA(event.target.value);
-    if (firstToken) handleperviweSwapAtoB(event.target.value);
+    // console.log("s", s);
+    if (firstToken) handleperviweSwapAtoB(s);
   };
   const handleInputChangeB = (event) => {
+    const s = z.multipliedBy(event.target.value);
     setPretokenB(event.target.value);
-    if (!firstToken) handleperviweSwapBtoA(event.target.value);
+    if (!firstToken) handleperviweSwapBtoA(s);
   };
 
   const isEmpty = (value) => {
