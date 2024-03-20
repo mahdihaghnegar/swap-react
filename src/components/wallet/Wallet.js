@@ -8,9 +8,9 @@ function WalletButton({ change, showWallet }) {
   const [walletAddress, setWalletAddress] = useState("");
 
   async function initWeb3() {
-    setConnected(false);
-    setSepolia(false);
-    change(null, false);
+    //setConnected(false);
+    //setSepolia(false);
+    //change(null, false);
     if (window.ethereum) {
       try {
         // Request account access if needed
@@ -22,19 +22,21 @@ function WalletButton({ change, showWallet }) {
         setSepolia(isSepolia());
         setConnected(true);
         setWalletAddress(accounts[0]);
-        change(accounts[0], sepolia);
+        change(accounts[0], sepolia, true);
       } catch (error) {
         console.error("Error while connecting to MetaMask: ", error);
       }
     } else {
       setWalletAddress(null);
-
+      setConnected(false);
+      setSepolia(false);
+      change(null, false);
       console.error("MetaMask extension not detected");
     }
   }
   useEffect(() => {
     initWeb3();
-  }, [walletAddress]);
+  }, [walletAddress, sepolia]);
 
   useEffect(() => {
     const handleAccountChange = async (accounts) => {

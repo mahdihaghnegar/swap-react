@@ -95,7 +95,7 @@ function Swap({ account }) {
     try {
       // Example: Call a read function
       const result = await swapContract.methods
-        .perviewSwapAtoB(amountTokenA.toFixed(0))
+        .perviewSwapAtoB(BigNumber(amountTokenA).toFixed(0))
         .call({ from: account });
       const r2 = BigNumber(result).dividedBy(z).toFixed(18);
       setPretokenBshow(r2);
@@ -115,7 +115,7 @@ function Swap({ account }) {
     try {
       // Example: Call a read function
       const result = await swapContract.methods
-        .perviewSwapBtoA(amountTokenB.toFixed(0))
+        .perviewSwapBtoA(BigNumber(amountTokenB).toFixed(0))
         .call({ from: account });
       const r2 = BigNumber(result).dividedBy(z).toFixed(18);
       setPretokenAshow(r2);
@@ -254,11 +254,13 @@ function Swap({ account }) {
     if (firstToken) {
       setFirstToken(false);
       setPretokenB(pretokenBshow.toString());
-      handleperviweSwapBtoA(pretokenBshow.toString());
+      const s = z.multipliedBy(pretokenBshow);
+      handleperviweSwapBtoA(s);
     } else {
       setFirstToken(true);
       setPretokenA(pretokenAshow.toString());
-      handleperviweSwapAtoB(pretokenAshow.toString());
+      const s = z.multipliedBy(pretokenAshow);
+      handleperviweSwapAtoB(s);
     }
   };
 
