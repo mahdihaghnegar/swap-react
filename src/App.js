@@ -6,13 +6,14 @@ import "./App.css";
 const App = () => {
   const [account, setAccount] = useState(null);
   const [sepolia, setSepolia] = useState(false);
+  const [reload, setReload] = useState(false);
 
   function handleChange(address, isSepolia) {
     console.log("handle setAccount changed:", address);
     console.log("handle setSepolia changed:", isSepolia);
     setAccount(address);
     setSepolia(isSepolia);
-    // if (address !== null && isSepolia) window.location.reload();
+    setReload(address !== null && isSepolia);
   }
   useEffect(() => {
     // This block will be executed whenever 'account' changes
@@ -23,7 +24,11 @@ const App = () => {
   return (
     <div className="App">
       <div className="right-aligned">
-        <WalletButton change={handleChange} showWallet={false} />
+        <WalletButton
+          change={handleChange}
+          showWallet={false}
+          reload={reload}
+        />
       </div>
 
       <div className="center">
@@ -34,7 +39,11 @@ const App = () => {
         <hr />
         {account && sepolia && <Swap account={account} />}
         <div className="center-connect">
-          <WalletButton change={handleChange} showWallet={true} />
+          <WalletButton
+            change={handleChange}
+            showWallet={true}
+            reload={reload}
+          />
         </div>
       </div>
     </div>

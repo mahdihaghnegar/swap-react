@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Web3 from "web3";
 import "./Wallet.css";
-function WalletButton({ change, showWallet }) {
+function WalletButton({ change, showWallet, reload }) {
   const [connected, setConnected] = useState(false);
   const [sepolia, setSepolia] = useState(false);
   const [chainId, setChainId] = useState("");
@@ -30,13 +30,13 @@ function WalletButton({ change, showWallet }) {
       setWalletAddress(null);
       setConnected(false);
       setSepolia(false);
-      change(null, false);
+      change(null, false, false);
       console.error("MetaMask extension not detected");
     }
   }
   useEffect(() => {
     initWeb3();
-  }, [walletAddress, sepolia]);
+  }, [walletAddress, sepolia, reload]);
 
   useEffect(() => {
     const handleAccountChange = async (accounts) => {
@@ -45,7 +45,7 @@ function WalletButton({ change, showWallet }) {
         console.log("MetaMask account disconnected");
         //closeDApp(); // Call your dApp closing function
         setWalletAddress(null);
-        change(null, false);
+        change(null, false, false);
       }
       window.location.reload();
       //  setSepolia(isSepolia());
@@ -61,7 +61,7 @@ function WalletButton({ change, showWallet }) {
         console.log("MetaMask chainId not Found");
         //closeDApp(); // Call your dApp closing function
         setWalletAddress(null);
-        change(null, false);
+        change(null, false, false);
       } else {
         window.location.reload();
         console.log("chainid after reload:", chainId);
